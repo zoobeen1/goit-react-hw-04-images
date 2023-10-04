@@ -1,14 +1,13 @@
-// import { GlobalStyle } from 'GlobalStyle';
-import 'react-toastify/dist/ReactToastify.css';
 import { GlobalStyle } from 'GlobalStyle';
 import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import React, { useState } from 'react';
-//import axios from 'axios';
 import { Searchbar } from 'components/Searchbar';
 import { ImageLoader } from 'components/ImageLoader';
 import { Modal } from './Modal';
 
 export function App() {
+  //States
   const [query, setQuery] = useState('');
   const [imgUrl, setImgUrl] = useState('');
   const [imgName, setImgName] = useState('');
@@ -24,7 +23,7 @@ export function App() {
     setImgName(name);
     togleModal();
   };
-
+  //Нажали кнопку поиска - обработчик
   const handleFormSubmit = searchQuery => setQuery(searchQuery);
 
   // *************************************************************************
@@ -34,7 +33,6 @@ export function App() {
       <GlobalStyle />
       <Searchbar onSubmit={handleFormSubmit} />
       <ImageLoader onModal={onModal} query={query} />
-
       <ToastContainer autoClose={1000} />
       {showModal && (
         <Modal togleModal={togleModal}>
