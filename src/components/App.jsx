@@ -24,10 +24,11 @@ export function App() {
     togleModal();
   };
   //Нажали кнопку поиска - обработчик
-  const handleFormSubmit = searchQuery => setQuery(searchQuery);
+  const handleFormSubmit = searchQuery => {
+    setQuery(searchQuery);
+  };
 
   // *************************************************************************
-
   return (
     <>
       <GlobalStyle />

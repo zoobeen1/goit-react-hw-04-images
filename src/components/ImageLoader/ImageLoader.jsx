@@ -1,43 +1,29 @@
-import { Component } from 'react';
+import { useEffect, useState } from 'react';
 import { ImageGallery } from 'components/ImageGallery';
 import API from 'services/api';
 import { toast } from 'react-toastify';
 import { Button } from 'components/Button';
 import { Loader } from 'components/Loader/Loader';
 
-export class ImageLoader extends Component {
-  state = {
-    imgs: null,
-    error: null,
-    status: 'idle',
-    hitCounter: 0,
-    //State machine:
-    //idle - простой,
-    //pending - добавляется,
-    //resolved - успешно,
-    //rejected - отклонено
-  };
+export function ImageLoader({ query, onModal }) {
+  //States
+  const [hitCounter, setHitCounter] = useState(0);
+  const [imgs, setImgs] = useState(null);
+  // const [error, setError] = useState(null);
+  const [status, setStatus] = useState('idle');
 
-  componentDidUpdate(prevProps, prevState) {
-    if (this.props.query !== prevProps.query) {
-      this.setState({
-        status: 'pending',
-        imgs: null,
-        error: null,
-      });
-      this.onLoad(this.props.query);
-    }
-  }
+  //State machine:
+  //idle - простой,
+  //pending - добавляется,
+  //resolved - успешно,
+  //rejected - отклонено
 
-  onError() {
-    this.setState({
-      error: API.params.error,
-      status: 'rejected',
-    });
-    toast.error('Oops, something went wrong. Please try again.');
-  }
+  useEffect(() => {
+    query && onLoad(query);
+  }, [query]);
 
-  onLoad = query => {
+  const onLoad = query => {
+    setStatus('pending');
     API.params.q = query;
     API.params.page = 1;
 
@@ -50,17 +36,14 @@ export class ImageLoader extends Component {
         return false;
       }
       // toast.success(`Hooray! We found ${resp.total} images.`);
-      this.setState({
-        status: 'resolved',
-        imgs: resp.hits,
-        hitCounter: API.params.per_page,
-      });
+      setStatus('resolved');
+      setImgs(resp.hits);
+      setHitCounter(API.params.per_page);
       return true;
     });
   };
 
-  onLoadMore = () => {
-    const { hitCounter } = this.state;
+  const onLoadMore = () => {
     API.params.page++;
     API.getPhotos()
       .then(resp => {
@@ -68,35 +51,30 @@ export class ImageLoader extends Component {
           toast.info(
             "We're sorry, but you've reached the end of search results."
           );
-          return;
+          return false;
         }
-        this.setState(prevState => {
-          console.log('Работает setState');
-          return {
-            status: 'resolved',
-            imgs: [...prevState.imgs, ...resp.hits],
-          };
-        });
-        this.setState({
-          hitCounter: this.state.hitCounter + API.params.per_page,
-        });
-        // lightbox.refresh();
+        setStatus('resolved');
+        setImgs(prevState => [...prevState, ...resp.hits]);
+        setHitCounter(hitCounter + API.params.per_page);
       })
-      .catch(console.log('Error in catch'));
+      .catch(err => console.log('Error in catch ', err));
   };
 
-  render() {
-    const { imgs, status } = this.state;
-
-    // if (status === 'idle') return <div>Введите запрос</div>;
-    if (status === 'pending') return <Loader />;
-    if (status === 'rejected') return <div>Ошибка!</div>;
-    if (status === 'resolved')
-      return (
-        <>
-          <ImageGallery onModal={this.props.onModal} imgs={imgs} />
-          <Button onClick={this.onLoadMore} />
-        </>
-      );
-  }
+  // if (status === 'idle') return <div>Введите запрос</div>;
+  if (status === 'pending') return <Loader />;
+  if (status === 'rejected') return <div>Ошибка!</div>;
+  if (status === 'resolved')
+    return (
+      <>
+        <ImageGallery onModal={onModal} imgs={imgs} />
+        <Button onClick={onLoadMore} />
+      </>
+    );
 }
+// const onError = () => {
+//   this.setState({
+//     error: API.params.error,
+//     status: 'rejected',
+//   });
+//   toast.error('Oops, something went wrong. Please try again.');
+// }
