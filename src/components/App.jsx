@@ -2,55 +2,45 @@
 import 'react-toastify/dist/ReactToastify.css';
 import { GlobalStyle } from 'GlobalStyle';
 import { ToastContainer } from 'react-toastify';
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 //import axios from 'axios';
 import { Searchbar } from 'components/Searchbar';
 import { ImageLoader } from 'components/ImageLoader';
 import { Modal } from './Modal';
-// import { ImageGallery } from 'components/ImageGallery';
-// import { Button } from 'components/Button';
 
-export class App extends Component {
-  state = {
-    query: '',
-    imgUrl: '',
-    imgName: '',
-    showModal: false,
+export function App() {
+  const [query, setQuery] = useState('');
+  const [imgUrl, setImgUrl] = useState('');
+  const [imgName, setImgName] = useState('');
+  const [showModal, setShowModal] = useState(false);
+
+  //Functions
+  //Тоглим модалку
+  const togleModal = () => setShowModal(pshowModal => !pshowModal);
+
+  //Вызов модалки
+  const onModal = (url, name) => {
+    setImgUrl(url);
+    setImgName(name);
+    togleModal();
   };
 
-  togleModal = () => {
-    this.setState(({ showModal }) => ({
-      showModal: !showModal,
-    }));
-  };
+  const handleFormSubmit = searchQuery => setQuery(searchQuery);
 
-  onModal = (url, name) => {
-    this.setState({
-      imgUrl: url,
-      imgName: name,
-    });
-    this.togleModal();
-  };
-
-  handleFormSubmit = searchQuery => {
-    this.setState({ query: searchQuery });
-  };
   // *************************************************************************
-  render() {
-    const { imgUrl, imgName, showModal } = this.state;
-    return (
-      <>
-        <GlobalStyle />
-        <Searchbar onSubmit={this.handleFormSubmit} />
-        <ImageLoader onModal={this.onModal} query={this.state.query} />
 
-        <ToastContainer autoClose={1000} />
-        {showModal && (
-          <Modal togleModal={this.togleModal}>
-            <img src={imgUrl} alt={imgName} />
-          </Modal>
-        )}
-      </>
-    );
-  }
+  return (
+    <>
+      <GlobalStyle />
+      <Searchbar onSubmit={handleFormSubmit} />
+      <ImageLoader onModal={onModal} query={query} />
+
+      <ToastContainer autoClose={1000} />
+      {showModal && (
+        <Modal togleModal={togleModal}>
+          <img src={imgUrl} alt={imgName} />
+        </Modal>
+      )}
+    </>
+  );
 }

@@ -1,5 +1,4 @@
 import { Component } from 'react';
-// import PropTypes from 'prop-types';
 import { ImageGallery } from 'components/ImageGallery';
 import API from 'services/api';
 import { toast } from 'react-toastify';
@@ -101,14 +100,3 @@ export class ImageLoader extends Component {
       );
   }
 }
-
-// Contacts.propTypes = {
-//   contacts: PropTypes.arrayOf(
-//     PropTypes.shape({
-//       id: PropTypes.string.isRequired,
-//       name: PropTypes.string.isRequired,
-//       number: PropTypes.string.isRequired,
-//     })
-//   ).isRequired,
-//   deleteContact: PropTypes.func.isRequired,
-// };
