@@ -5,13 +5,15 @@ import { createPortal } from 'react-dom';
 const modalRoot = document.querySelector('#modal-root');
 
 export function Modal({ children, togleModal }) {
+  //Functions
+
+  const handleBakcdropClick = e => e.currentTarget === e.target && togleModal();
+
   useEffect(() => {
+    const handleKeyDown = e => e.code === 'Escape' && togleModal();
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-  //Functions
-  const handleKeyDown = e => e.code === 'Escape' && togleModal();
-  const handleBakcdropClick = e => e.currentTarget === e.target && togleModal();
+  }, [togleModal]);
 
   return createPortal(
     <StyledOverlay onClick={handleBakcdropClick}>
