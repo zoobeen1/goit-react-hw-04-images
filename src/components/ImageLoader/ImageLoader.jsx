@@ -27,20 +27,21 @@ export function ImageLoader({ query, onModal }) {
     API.params.q = query;
     API.params.page = 1;
 
-    API.getPhotos().then(resp => {
-      if (resp.total === 0) {
-        toast.error(
-          'Sorry, there are no images matching your search query. Please try again.'
-        );
-
-        return false;
-      }
-      // toast.success(`Hooray! We found ${resp.total} images.`);
-      setStatus('resolved');
-      setImgs(resp.hits);
-      setHitCounter(API.params.per_page);
-      return true;
-    });
+    API.getPhotos()
+      .then(resp => {
+        if (resp.total === 0) {
+          toast.error(
+            'Sorry, there are no images matching your search query. Please try again.'
+          );
+          setStatus('idle');
+          return;
+        }
+        // toast.success(`Hooray! We found ${resp.total} images.`);
+        setImgs(resp.hits);
+        setHitCounter(API.params.per_page);
+        setStatus('resolved'); //Важно чтобы было в конце - реакт перерендеривает асинхронный код на каждом шаге
+      })
+      .catch(err => console.log('Error in catch ', err));
   };
 
   const onLoadMore = () => {
@@ -53,7 +54,6 @@ export function ImageLoader({ query, onModal }) {
           );
           return false;
         }
-        setStatus('resolved');
         setImgs(prevState => [...prevState, ...resp.hits]);
         setHitCounter(hitCounter + API.params.per_page);
       })
@@ -71,10 +71,3 @@ export function ImageLoader({ query, onModal }) {
       </>
     );
 }
-// const onError = () => {
-//   this.setState({
-//     error: API.params.error,
-//     status: 'rejected',
-//   });
-//   toast.error('Oops, something went wrong. Please try again.');
-// }
