@@ -9,7 +9,6 @@ export function ImageLoader({ query, onModal }) {
   //States
   const [hitCounter, setHitCounter] = useState(0);
   const [imgs, setImgs] = useState(null);
-  // const [error, setError] = useState(null);
   const [status, setStatus] = useState('idle');
 
   //State machine:
@@ -36,28 +35,44 @@ export function ImageLoader({ query, onModal }) {
           setStatus('idle');
           return;
         }
-        // toast.success(`Hooray! We found ${resp.total} images.`);
+        toast.success(`Hooray! We found ${resp.totalHits} images.`);
         setImgs(resp.hits);
-        setHitCounter(API.params.per_page);
+        setHitCounter(resp.totalHits - API.params.per_page);
         setStatus('resolved'); //Важно чтобы было в конце - реакт перерендеривает асинхронный код на каждом шаге
       })
-      .catch(err => console.log('Error in catch ', err));
+      .catch(err =>
+        console.log(
+          'Error in catch: ',
+          err.message,
+          ' response: ',
+          err.response.data
+        )
+      );
   };
 
   const onLoadMore = () => {
     API.params.page++;
+
     API.getPhotos()
       .then(resp => {
-        if (resp.totalHits <= hitCounter) {
+        if (hitCounter < API.params.per_page) {
           toast.info(
             "We're sorry, but you've reached the end of search results."
           );
-          return false;
+
+          return;
         }
         setImgs(prevState => [...prevState, ...resp.hits]);
-        setHitCounter(hitCounter + API.params.per_page);
+        setHitCounter(p => p - API.params.per_page);
       })
-      .catch(err => console.log('Error in catch ', err));
+      .catch(err =>
+        console.log(
+          'Error in catch: ',
+          err.message,
+          ' response: ',
+          err.response.data
+        )
+      );
   };
 
   // if (status === 'idle') return <div>Введите запрос</div>;

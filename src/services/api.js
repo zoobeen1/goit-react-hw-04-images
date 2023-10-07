@@ -7,7 +7,7 @@ const params = {
   q: '', //Qery (строка запроса поиска)
   image_type: 'photo',
   orientation: 'horizontal',
-  safesearch: true,
+  safesearch: false,
   per_page: 12,
   page: 1,
 };
@@ -23,7 +23,7 @@ async function getPhotos() {
     });
     return await resp.data;
   } catch (err) {
-    console.log('Трай кетч - ', err);
+    console.log('Трай кетч - ', err.message, ' ', err.response.data);
     return err;
   }
 }
